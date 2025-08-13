@@ -1,6 +1,6 @@
 [build]
-  command = "npm run build" # আপনার বিল্ড কমান্ড
-  publish = "dist" # বিল্ড আউটপুট ফোল্ডার
+  command = "npm run build" # আপনার বিল্ড কমান্ড, যদি থাকে
+  publish = "public"        # public ফোল্ডার সার্ভ করা হবে
   functions = "netlify/functions"
 
 [[headers]]
