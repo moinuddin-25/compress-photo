@@ -1,4 +1,10 @@
 [build]
-  command = "npm run build" # আপনার বিল্ড কমান্ড (যেমন React-এর জন্য)
-  publish = "dist" # আপনার বিল্ড আউটপুট ফোল্ডার (যেমন dist/public)
+  command = "npm run build" # আপনার বিল্ড কমান্ড
+  publish = "dist" # বিল্ড আউটপুট ফোল্ডার
   functions = "netlify/functions"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    X-Frame-Options = "DENY"
