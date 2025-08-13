@@ -446,4 +446,185 @@
           link.href = URL.createObjectURL(content);
           link.download = 'compressed-images.zip';
           link.click();
+          URL.revokeObjectURL(link.href);
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', reset);
+      }
+
+      // Utility: Read file as DataURL
+      function readFileAsDataURL(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = () => reject(new Error('Failed to read file'));
+          reader.readAsDataURL(file);
+        });
+      }
+
+      // Utility: Compress DataURL image using canvas
+      function compressDataUrl(dataUrl, quality) {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let { width, height } = img;
+
+            if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+              const ratio = Math.min(MAX_WIDTH / width, MAX_HEIGHT / height);
+              width = Math.round(width * ratio);
+              height = Math.round(height * ratio);
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+            resolve(compressedDataUrl);
+          };
           
+          img.onerror = () => reject(new Error('Failed to load image for compression'));
+          img.src = dataUrl;
+        });
+      }
+
+      // Utility: Convert DataURL to Blob
+      function dataURLtoBlob(dataurl) {
+        const arr = dataurl.split(',');
+        const mime = arr[0].match(/:(.*?);/)[1];
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) {
+          u8arr[n] = bstr.charCodeAt(n);
+        }
+        return new Blob([u8arr], { type: mime });
+      }
+
+      // On file input change
+      uploadInput.addEventListener('change', () => {
+        if (uploadInput.files.length === 0) {
+          showError('No files selected.');
+          return;
+        }
+        compressImages(uploadInput.files);
+      });
+    });
+
+
+// Modal control functions
+function openModal(modalId) {
+  document.getElementById(modalId).classList.remove('hidden');
+  document.body.style.overflow = 'hidden'; 
+// Prevent scrolling
+}
+
+function closeModal(modalId) {
+  document.getElementById(modalId).classList.add('hidden');
+  document.body.style.overflow = ''; // Re-enable scrolling
+}
+
+// Close modals when clicking outside content
+document.querySelectorAll('[id$="-modal"]').forEach(modal => {
+  modal.addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeModal(this.id);
+    }
+  });
+});
+
+// Close on Escape key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('[id$="-modal"]').forEach(modal => {
+      if (!modal.classList.contains('hidden')) {
+        closeModal(modal.id);
+      }
+    });
+  }
+});
+ 
+ 
+// Cookie Consent Manager
+document.addEventListener('DOMContentLoaded', function() {
+  // Elements
+  const cookieConsent = document.getElementById('cookie-consent');
+  const cookieAccept = document.getElementById('cookie-accept');
+  const cookieReject = document.getElementById('cookie-reject');
+  const cookieSettings = document.getElementById('cookie-settings');
+  const cookieModal = document.getElementById('cookie-settings-modal');
+  const cookieModalClose = document.getElementById('cookie-modal-close');
+  const analyticsToggle = document.getElementById('analytics-cookies');
+
+  // Check if consent was given
+  function checkConsent() {
+    return localStorage.getItem('cookieConsent');
+  }
+
+  // Show cookie banner if no consent
+  if (!checkConsent()) {
+    cookieConsent.classList.remove('hidden');
+  }
+
+  // Set cookie consent
+  function setConsent(consent) {
+    localStorage.setItem('cookieConsent', JSON.stringify(consent));
+    cookieConsent.classList.add('hidden');
+    
+    // Here you would implement the actual cookie setting logic
+    if (consent.analytics) {
+      // Load analytics scripts
+      console.log('Analytics cookies enabled');
+    } else {
+      console.log('Analytics cookies disabled');
+    }
+  }
+
+  // Event Listeners
+  cookieAccept.addEventListener('click', function() {
+    setConsent({
+      essential: true,
+      analytics: true
+    });
+  });
+
+  cookieReject.addEventListener('click', function() {
+    setConsent({
+      essential: true, // Essential cookies cannot be rejected
+      analytics: false
+    });
+  });
+
+  cookieSettings.addEventListener('click', function() {
+    // Set toggle to current preference
+    const consent = checkConsent() ? JSON.parse(checkConsent()) : { analytics: false };
+    analyticsToggle.checked = consent.analytics || false;
+    cookieModal.classList.remove('hidden');
+  });
+
+  cookieModalClose.addEventListener('click', function() {
+    cookieModal.classList.add('hidden');
+  });
+
+  // Save settings
+  document.getElementById('save-cookie-settings').addEventListener('click', function() {
+    setConsent({
+      essential: true,
+      analytics: analyticsToggle.checked
+    });
+    cookieModal.classList.add('hidden');
+  });
+
+  // Initialize analytics based on existing consent
+  const existingConsent = checkConsent();
+  if (existingConsent && JSON.parse(existingConsent).analytics) {
+    // Load analytics if previously consented
+    console.log('Loading existing analytics consent');
+  }
+});
+  </script>
+</body>
+
+</html>
