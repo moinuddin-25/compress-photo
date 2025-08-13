@@ -4,5 +4,8 @@
   "dependencies": {
     "sharp": "^0.33.5",
     "jszip": "^3.10.1"
+  },
+  "scripts": {
+    "build": "echo \"No build needed\""
   }
 }
