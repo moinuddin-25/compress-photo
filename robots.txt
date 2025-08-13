@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /private/
+Disallow: /temp/
+Disallow: /admin/
+
+Sitemap: https://www.compress-photo.netlify.com/sitemap.xml
