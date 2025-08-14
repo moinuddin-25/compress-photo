@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Compress images using Netlify Functions
   async function compressImages(files) {
     if (!files.length) {
-      showError('No files selected.');
+      showError('No file selected.');
       return;
     }
 
@@ -46,12 +46,12 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    sizeInfo.textContent = `Selected ${imageFiles.length} image(s). Processing...`;
+    sizeInfo.textContent = `${imageFiles.length} image(s) selected. Processing...`;
     progressSection.classList.remove('hidden');
     progressBar.value = 0;
     outputSection.classList.add('hidden');
     outputSection.innerHTML = '';
-    imagePreviews.innerHTML = '';
+    imagePreviews.innerHTML = ''; // Clear the preview div
 
     const zip = new JSZip();
     let progress = 0;
@@ -61,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         // Read file as DataURL
         const dataUrl = await readFileAsDataURL(file);
+        console.log(`Processing file: ${file.name}`); // For debugging
 
         // Send to Netlify Function for compression
         const response = await fetch('/.netlify/functions/compress', {
@@ -73,22 +74,23 @@ document.addEventListener('DOMContentLoaded', () => {
           })
         });
 
-        const result = await response.json();
         if (!response.ok) {
-          throw new Error(result.error || 'Compression failed');
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Compression failed');
         }
 
+        const result = await response.json();
         const compressedDataUrl = result.compressedImage;
         const compressedBlob = dataURLtoBlob(compressedDataUrl);
 
-        // Add compressed file to ZIP
+        // Add compressed image to ZIP
         zip.file(`compressed-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`, compressedBlob);
 
-        // Calculate sizes
+        // Calculate original and compressed file sizes
         const originalSizeKB = (file.size / 1024).toFixed(2);
         const compressedSizeKB = (compressedBlob.size / 1024).toFixed(2);
 
-        // Create preview container
+        // Create preview card
         const container = document.createElement('div');
         container.classList.add('compressor-card', 'p-3');
         container.innerHTML = `
@@ -114,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Preview modal handler
         container.querySelector('.preview-btn').addEventListener('click', () => {
           const modal = document.createElement('div');
-          modal.classList.add('fixed', 'inset-0', 'bg-black', 'bg-opacity-50', 'flex', 'justify-center', 'items-center', 'z-50');
+          modal.classList.add's', 'inset-0', 'bg-black', 'bg-opacity-50', 'flex', 'justify-center', 'items-center', 'z-50');
           modal.innerHTML = `
             <div class="bg-white p-4 rounded-lg max-w-[90%] max-h-[90%] overflow-auto">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -134,12 +136,14 @@ document.addEventListener('DOMContentLoaded', () => {
           modal.querySelector('button').addEventListener('click', () => modal.remove());
         });
 
-        imagePreviews.appendChild(container);
+        imagePreviews.appendChild(container); // Add preview
+        console.log(`Preview added for: ${file.name}`); // For debugging
 
         // Update progress bar
         progress += progressIncrement;
         progressBar.value = Math.min(progress, 100);
       } catch (error) {
+        console.error(`Error processing image ${file.name}: ${error.message}`); // For debugging
         showError(`Error processing image ${file.name}: ${error.message}`);
         reset();
         return;
@@ -202,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // On file input change
   uploadInput.addEventListener('change', () => {
     if (uploadInput.files.length === 0) {
-      showError('No files selected.');
+      showError('No file selected.');
       return;
     }
     compressImages(uploadInput.files);
