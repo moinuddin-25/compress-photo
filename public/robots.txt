@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://compress-photo.netlify.app/sitemap.xml
