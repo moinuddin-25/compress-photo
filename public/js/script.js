@@ -1,3 +1,7 @@
+
+console.log("JavaScript is working!");
+alert("Script loaded!");
+
 // public/script.js
 document.addEventListener('DOMContentLoaded', () => {
   const MAX_FILE_SIZE_MB = 10;
