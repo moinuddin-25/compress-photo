@@ -1,3 +1,4 @@
+// public/script.js
 document.addEventListener('DOMContentLoaded', () => {
   const MAX_FILE_SIZE_MB = 10;
   const uploadInput = document.getElementById('imageInput');
@@ -38,7 +39,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const imageFiles = Array.from(files).filter(
-      file => (file.type === 'image/jpeg' || file.type === 'image/png') && file.size <= MAX_FILE_SIZE_MB * 1024 * 1024
+      (file) =>
+        (file.type === 'image/jpeg' || file.type === 'image/png') &&
+        file.size <= MAX_FILE_SIZE_MB * 1024 * 1024
     );
 
     if (imageFiles.length === 0) {
@@ -61,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         // Read file as DataURL
         const dataUrl = await readFileAsDataURL(file);
-        console.log(`Processing file: ${file.name}`); // For debugging
+        console.log(`Processing file: ${file.name}`);
 
         // Send to Netlify Function for compression
         const response = await fetch('/.netlify/functions/compress', {
@@ -70,16 +73,20 @@ document.addEventListener('DOMContentLoaded', () => {
           body: JSON.stringify({
             imageData: dataUrl,
             format: 'webp',
-            quality: qualityRange.value
-          })
+            quality: parseInt(qualityRange.value),
+          }),
         });
 
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Compression failed');
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || `Compression failed for ${file.name}`);
         }
 
         const result = await response.json();
+        if (!result.compressedImage) {
+          throw new Error('No compressed image returned');
+        }
+
         const compressedDataUrl = result.compressedImage;
         const compressedBlob = dataURLtoBlob(compressedDataUrl);
 
@@ -116,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Preview modal handler
         container.querySelector('.preview-btn').addEventListener('click', () => {
           const modal = document.createElement('div');
-          modal.classList.add's', 'inset-0', 'bg-black', 'bg-opacity-50', 'flex', 'justify-center', 'items-center', 'z-50');
+          modal.classList.add('fixed', 'inset-0', 'bg-black', 'bg-opacity-50', 'flex', 'justify-center', 'items-center', 'z-50');
           modal.innerHTML = `
             <div class="bg-white p-4 rounded-lg max-w-[90%] max-h-[90%] overflow-auto">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -136,14 +143,14 @@ document.addEventListener('DOMContentLoaded', () => {
           modal.querySelector('button').addEventListener('click', () => modal.remove());
         });
 
-        imagePreviews.appendChild(container); // Add preview
-        console.log(`Preview added for: ${file.name}`); // For debugging
+        imagePreviews.appendChild(container);
+        console.log(`Preview added for: ${file.name}`);
 
         // Update progress bar
         progress += progressIncrement;
         progressBar.value = Math.min(progress, 100);
       } catch (error) {
-        console.error(`Error processing image ${file.name}: ${error.message}`); // For debugging
+        console.error(`Error processing image ${file.name}: ${error.message}`);
         showError(`Error processing image ${file.name}: ${error.message}`);
         reset();
         return;
@@ -279,7 +286,7 @@ function closeModal(modalId) {
   document.body.style.overflow = '';
 }
 
-document.querySelectorAll('[id$="-modal"]').forEach(modal => {
+document.querySelectorAll('[id$="-modal"]').forEach((modal) => {
   modal.addEventListener('click', function (e) {
     if (e.target === this) {
       closeModal(this.id);
@@ -289,10 +296,11 @@ document.querySelectorAll('[id$="-modal"]').forEach(modal => {
 
 document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') {
-    document.querySelectorAll('[id$="-modal"]').forEach(modal => {
+    document.querySelectorAll('[id$="-modal"]').forEach((modal) => {
       if (!modal.classList.contains('hidden')) {
         closeModal(modal.id);
       }
     });
   }
 });
+
