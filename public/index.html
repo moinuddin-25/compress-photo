@@ -25,71 +25,114 @@
 
   <!-- Google Fonts -->
   <link rel="preload" href="https://fonts.googleapis.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
 
   <!-- Tailwind CDN -->
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link rel="preload" href="https://cdn.tailwindcss.com" as="style" onload="this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.tailwindcss.com"></noscript>
 
   <!-- JSZip CDN for ZIP functionality -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
-  <!-- Custom CSS -->
-  <style>
-    body{font-family: Inter, sans-serif;
-        font-diplay:swap; }
-    .preview-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
-    }
-    .image-preview {
-      width: 100%;
-      height: 180px;
-      object-fit: cover;
-      border-radius: 0.5rem;
-    }
-    /* Mobile view (2 columns) */
-    @media (max-width: 640px) {
-      .preview-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.75rem;
-      }
-      .image-preview {
-        height: 140px;
-      }
-    }
-    .compressor-card {
-      background: white;
-      border-radius: 0.5rem;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      transition: all 0.2s ease;
-    }
-    .compressor-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-    }
-    .input-hover:hover {
-      border-color: #1994e6;
-    }
-    .btn-hover:hover {
-      transform: scale(1.05);
-    }
-    /* Hero background gradient */
-    .bg-hero {
-      background: linear-gradient(135deg, #1994e6 0%, #0f204a 100%);
-    }
-    div.mx-auto a img { height: 60px; width: auto; }
-    /* Mobile adjustments */
-    @media (max-width: 640px) {
-      .preview-grid {
-        gap: 0.75rem;
-      }
-      .image-preview {
-        height: 120px;
-      }
-      div.mx-auto a img { height: 40px; width: auto; 
-         }
-    }
+<style>
+  /* ============================= */
+/* Complete Critical CSS - Compress Photo */
+/* ============================= */
+
+/* Font Faces (WOFF2 for performance) */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/inter/v19/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfMZg.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/inter/v19/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuI6fMZg.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/inter/v19/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuFuYMZg.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/inter/v19/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuBWYMZg.woff2') format('woff2');
+}
+
+/* Body default font */
+body {
+  font-family: 'Inter', sans-serif;
+  font-display: swap;
+  margin: 0;
+}
+
+/* ========================= */
+/* Header & Hero */
+div.mx-auto a img {
+  height: 60px;
+  width: auto;
+}
+.bg-hero {
+  background: linear-gradient(135deg, #1994e6 0%, #0f204a 100%);
+}
+
+/* ========================= */
+/* Image Preview Grid */
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+.image-preview {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 0.5rem;
+}
+
+/* Compressor Cards & Buttons */
+.compressor-card {
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
+}
+.compressor-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+.input-hover:hover {
+  border-color: #1994e6;
+}
+.btn-hover:hover {
+  transform: scale(1.05);
+}
+
+/* ========================= */
+/* Mobile adjustments */
+@media (max-width: 640px) {
+  .preview-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  .image-preview {
+    height: 120px;
+  }
+  div.mx-auto a img {
+    height: 40px;
+    width: auto;
+  }
+}
     
   </style>
   <!-- Google tag (gtag.js) -->
